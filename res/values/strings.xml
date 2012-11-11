@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="hello">Hello World, MainActivity!</string>
+    <string name="app_name">Garage Door Controller</string>
+    <string name="ipdomain">IP address or domain (url):</string>
+    <string name="port">Port:</string>
+    <string name="status_text_unknown">Garage door status: </string>
+    <string name="status_text_closed">Garage door status: CLOSED</string>
+    <string name="status_text_open">Garage door status: OPEN</string>
+    <string name="connection_status_disconnected">Connection status: Disconnected</string>
+    <string name="connection_status_connected">Connection status: Connected</string>
+    <string name="connect_button_connect">Connect</string>
+    <string name="connect_button_connecting">Connecting...</string>
+    <string name="connect_button_disconnect">Disconnect</string>
+    <string name="toggle_button_open">Open Garage Door</string>
+    <string name="toggle_button_close">Close Garage Door</string>
+    <string name="settings_header">Settings</string>
+    <string name="settings_ipdomain">Default IP/domain (url):</string>
+    <string name="settings_port">Default Port:</string>
+    <string name="settings_crack_ms">Milliseconds to pause</string>
+    <string name="settings_crack_ms_cont">(Used for when cracking the door)</string>
+    <string name="settings_password">Password:</string>
+
+</resources>

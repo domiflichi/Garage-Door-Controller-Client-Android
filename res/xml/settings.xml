@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <EditTextPreference android:key="settings_ipdomain"
+    				   android:title="@string/settings_ipdomain"
+    				   android:summary="IP/domain of your garage door" />
+    				   
+    <EditTextPreference android:key="settings_port"
+    				   android:title="@string/settings_port"
+    				   android:inputType="number"
+    				   android:summary="Port (TCP) # to use" />
+    				   
+    <EditTextPreference android:key="settings_password"
+    				   android:password="true"
+    				   android:title="@string/settings_password"
+    				   android:summary="Password needed to connect" />
+    				   
+    <EditTextPreference android:key="settings_crack_ms"
+    				   android:title="@string/settings_crack_ms"
+    				   android:inputType="number"
+    				   android:summary="(for 'cracking' door)" />
+
+</PreferenceScreen>
