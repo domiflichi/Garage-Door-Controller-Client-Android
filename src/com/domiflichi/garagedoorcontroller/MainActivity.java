@@ -568,6 +568,39 @@ public class MainActivity extends Activity implements OnClickListener, OnSharedP
     
     
     
+    // If another app comes into the foreground and interrupts our app
+    @Override
+    protected void onStop() {
+    	super.onStop();
+    	connectNet.setText(R.string.connect_button_connect);
+    	tvGDStatusText.setText(R.string.status_text_unknown);
+		toggleDoor.setEnabled(false);
+		myAtomicButtonInteger.getAndSet(4);
+		newStatusOfGarageDoor = "";
+		currentStatusOfGarageDoor = "";
+		//connected = false;
+		// socket.close();
+    }
+    
+    
+    
+    
+    @Override
+    protected void onResume()	{
+    	super.onResume();
+    	
+    	// Reset our 'myAtomicButtonInteger' back to '0' when we come back into the app after being
+    	//  Disturbed/paused/stopped
+    	myAtomicButtonInteger.getAndSet(0);
+    	
+    	// Not sure why we had to add these two following lines yet, but the reason we did is because:
+    	// If we were connected, and pressed the 'home' button on the device, then came back into the app
+    	//  and reconnected, it wouldn't display the garage door status
+    	newStatusOfGarageDoor = "";
+		currentStatusOfGarageDoor = "";
+    }
+    
+
     
     
 
