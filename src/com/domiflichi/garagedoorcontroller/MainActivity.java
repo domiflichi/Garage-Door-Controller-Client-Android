@@ -530,6 +530,8 @@ public class MainActivity extends Activity implements OnClickListener, OnSharedP
 								public void run() {
 									tvConStatusText.setText(R.string.connection_status_disconnected);
 									tvGDStatusText.setText(R.string.status_text_unknown);
+									crackDoor.setChecked(false);
+									crackDoor.setEnabled(false);
 									
 									// *****************BELOW IS NEW 11-29-13!!!!
 									newGDStatusImage = getResources().getDrawable(R.drawable.ic_inapp_status_unknown);
@@ -612,6 +614,8 @@ public class MainActivity extends Activity implements OnClickListener, OnSharedP
 		myAtomicButtonInteger.getAndSet(4);
 		newStatusOfGarageDoor = "";
 		currentStatusOfGarageDoor = "";
+		crackDoor.setChecked(false);
+		crackDoor.setEnabled(false);
 		
 		// *****************BELOW IS NEW 11-29-13!!!!
 		newGDStatusImage = getResources().getDrawable(R.drawable.ic_inapp_status_unknown);
