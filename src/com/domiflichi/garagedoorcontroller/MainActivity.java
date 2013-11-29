@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -34,6 +35,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -80,6 +82,9 @@ public class MainActivity extends Activity implements OnClickListener, OnSharedP
 
 	private TextView tvGDStatusText; // represents the 'garage door status text'
 	private TextView tvConStatusText; // represents the program's connection status
+	
+	private ImageView imgGarageDoorStatus; //NEW 11-29-13!!!
+	private Drawable newGDStatusImage; //NEW 11-29-13
 
 	private String settings_ip_domain;
 	//private String settings_port;
@@ -176,6 +181,13 @@ public class MainActivity extends Activity implements OnClickListener, OnSharedP
     	tvGDStatusText = (TextView) findViewById(R.id.status_text);
     	
     	tvConStatusText = (TextView) findViewById(R.id.connection_status);
+    	
+    	// DELETE THE BELOW 2 LINES!!
+    	//ImageView imgGarageDoorStatus = (ImageView) findViewById(R.id.garage_door_status);
+    	//Drawable newGDStatusImage;
+    	imgGarageDoorStatus = (ImageView) findViewById(R.id.garage_door_status);
+    	//newGDStatusImage = getResources().getDrawable(R.drawable.ic_inapp_status_closed);
+    	//imgGarageDoorStatus.setImageDrawable(newGDStatusImage);
     	
     	myAtomicButtonInteger = new AtomicInteger();
     	
@@ -302,6 +314,11 @@ public class MainActivity extends Activity implements OnClickListener, OnSharedP
         //defIPandPort.setText(getString(R.string.lifeStart));
         defIPDomain.setText(settings_ip_domain);
         defPort.setText(settings_port);
+        
+        // *****************BELOW IS NEW 11-29-13!!!!
+		newGDStatusImage = getResources().getDrawable(R.drawable.ic_inapp_status_unknown);
+    	imgGarageDoorStatus.setImageDrawable(newGDStatusImage);
+    	// *****************END NEW 11-29-13!!!!!!!!!
     }
     
     
@@ -444,11 +461,23 @@ public class MainActivity extends Activity implements OnClickListener, OnSharedP
     										tvGDStatusText.setText(R.string.status_text_open);
     										toggleDoor.setText(R.string.toggle_button_close);
     										crackDoor.setEnabled(false);
+    										
+    										// *****************BELOW IS NEW 11-29-13!!!!
+    										newGDStatusImage = getResources().getDrawable(R.drawable.ic_inapp_status_open);
+    								    	imgGarageDoorStatus.setImageDrawable(newGDStatusImage);
+    								    	// *****************END NEW 11-29-13!!!!!!!!!
+    										
     										Log.d("ServerActivity", "gdStateChanged!");
     									} else if (newStatusOfGarageDoor.equals("status:closed")) {
     										tvGDStatusText.setText(R.string.status_text_closed);
     										toggleDoor.setText(R.string.toggle_button_open);
     										crackDoor.setEnabled(true);
+    										
+    										// *****************BELOW IS NEW 11-29-13!!!!
+    										newGDStatusImage = getResources().getDrawable(R.drawable.ic_inapp_status_closed);
+    								    	imgGarageDoorStatus.setImageDrawable(newGDStatusImage);
+    								    	// *****************END NEW 11-29-13!!!!!!!!!
+    								    	
     										Log.d("ServerActivity", "gdStateChanged!");
     									} else {
     										
@@ -501,6 +530,11 @@ public class MainActivity extends Activity implements OnClickListener, OnSharedP
 								public void run() {
 									tvConStatusText.setText(R.string.connection_status_disconnected);
 									tvGDStatusText.setText(R.string.status_text_unknown);
+									
+									// *****************BELOW IS NEW 11-29-13!!!!
+									newGDStatusImage = getResources().getDrawable(R.drawable.ic_inapp_status_unknown);
+							    	imgGarageDoorStatus.setImageDrawable(newGDStatusImage);
+							    	// *****************END NEW 11-29-13!!!!!!!!!
 								}
 							});
     						//tvConStatusText.setText(R.string.connection_status_disconnected);
@@ -578,6 +612,12 @@ public class MainActivity extends Activity implements OnClickListener, OnSharedP
 		myAtomicButtonInteger.getAndSet(4);
 		newStatusOfGarageDoor = "";
 		currentStatusOfGarageDoor = "";
+		
+		// *****************BELOW IS NEW 11-29-13!!!!
+		newGDStatusImage = getResources().getDrawable(R.drawable.ic_inapp_status_unknown);
+    	imgGarageDoorStatus.setImageDrawable(newGDStatusImage);
+    	// *****************END NEW 11-29-13!!!!!!!!!
+    	
 		//connected = false;
 		// socket.close();
     }
