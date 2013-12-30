@@ -23,7 +23,6 @@ import java.io.BufferedReader; // input
 import java.io.InputStreamReader; // input
 import java.io.OutputStreamWriter; // output
 import java.io.PrintWriter;
-// import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
@@ -42,16 +41,6 @@ import android.widget.Toast;
 
 /*
  
- NOTES / TODOS:
- 	
- 1. Image (actually a drawing) for main page of a garage door that changes dynamically (open/closed)
- 
- 2. Disconnect, kill worker thread upon exiting, pausing, etc.
- 	
- 3. Handle issues when getting disconnected (by either network connection, server-side, etc.)
- 
-
- 
  Post-Project To-Dos:
  
  1. After project is COMPLETE, create a different version that has more security. i.e.
@@ -64,8 +53,8 @@ import android.widget.Toast;
  Note the bolded note about using 'removeMessages()' on your handler in onStop() to avoid exceptions
  
  This program requires the following permissions:
- Internet - Duh
- Access Network State - To make sure there is internet access upon program opening, closes if none available
+ Internet - Uses the Internet to connect the Garage Door Controller device
+ Access Network State - To make sure there is Internet access upon program opening, closes if none available
  
  */
 
@@ -75,7 +64,6 @@ public class MainActivity extends Activity implements OnClickListener, OnSharedP
 	
 	
 	private Button connectNet;
-	//private Button disconnectNet;
 	private Button toggleDoor;
 	
 	private CheckBox crackDoor;
@@ -87,7 +75,6 @@ public class MainActivity extends Activity implements OnClickListener, OnSharedP
 	private Drawable newGDStatusImage; //NEW 11-29-13
 
 	private String settings_ip_domain;
-	//private String settings_port;
 	private String serverIpAddress = "";
 	private String myPass;
 	private String line;
@@ -158,36 +145,24 @@ public class MainActivity extends Activity implements OnClickListener, OnSharedP
 
         defIPDomain = (EditText) findViewById(R.id.ip_domain);
         defPort = (EditText) findViewById(R.id.port);
-        //defIPandPort.setText(getString(R.string.lifeStart));
         defIPDomain.setText(settings_ip_domain);
         defPort.setText(settings_port);
         
         
         
         connectNet = (Button) findViewById(R.id.button_connect);
-    	// Pre-Multiple buttons
-    	//connectNet.setOnClickListener(connectListener);
     	connectNet.setOnClickListener(this);
-    	
-    	//disconnectNet = (Button) findViewById(R.id.button_disconnect);
-    	//disconnectNet.setOnClickListener(this);
     	
     	toggleDoor = (Button) findViewById(R.id.button_toggle_door);
     	toggleDoor.setOnClickListener(this);
     	
     	crackDoor = (CheckBox) findViewById(R.id.crack_door);
-    	//crackDoor.setOnClickListener(this);
     	
     	tvGDStatusText = (TextView) findViewById(R.id.status_text);
     	
     	tvConStatusText = (TextView) findViewById(R.id.connection_status);
     	
-    	// DELETE THE BELOW 2 LINES!!
-    	//ImageView imgGarageDoorStatus = (ImageView) findViewById(R.id.garage_door_status);
-    	//Drawable newGDStatusImage;
     	imgGarageDoorStatus = (ImageView) findViewById(R.id.garage_door_status);
-    	//newGDStatusImage = getResources().getDrawable(R.drawable.ic_inapp_status_closed);
-    	//imgGarageDoorStatus.setImageDrawable(newGDStatusImage);
     	
     	myAtomicButtonInteger = new AtomicInteger();
     	
@@ -211,21 +186,16 @@ public class MainActivity extends Activity implements OnClickListener, OnSharedP
     		// All code from below goes here!!!!
     		
     		if (!connected) { // IF we're not connected at the moment, then let's connect!
-    			//serverIpAddress = serverIp.getText().toString();
-    			//serverIpAddress = "192.168.0.178";
     			serverIpAddress = defIPDomain.getText().toString();
     	        serverPort = Integer.valueOf(defPort.getText().toString()); // ******* BE CAREFUL WITH THIS LINE - IT WILL CAUSE THE APP TO CRASH IF THERE IS NOTHING THERE!!!!!!! *****************
     			if (!serverIpAddress.equals("")) {
     				Thread cThread = new Thread(new ClientThread());
     				cThread.start();
-    				//connectNet.setEnabled(false); // Once the button is pressed, disable it. :)
-    				connectNet.setText(R.string.connect_button_connecting); // Actually we want to use one button and just toggle the text
+    				connectNet.setText(R.string.connect_button_connecting);
     			}
     		} else { // NEw ELSE STATEMENT FOR SINGLE CONNECT/DISCONNECT BUTTON
     			// NEW CODE FOR SINGLE CONNECT/DISCONNECT BUTTON
-    			// CODE HERE FOR DISCONNECT BUTTON
-    			// *** OLD CODE - COULD DELETE THIS NOW???? ***
-        		Log.d("ClientActivity", "Disconnect button pressed");
+    			//Log.d("ClientActivity", "Disconnect button pressed");
         		myAtomicButtonInteger.getAndSet(4);
         		//Log.d("ClientActivity", "(After) tmpAtomic=" + myAtomicButtonInteger.get());
         		toggleDoor.setEnabled(false);
@@ -234,12 +204,10 @@ public class MainActivity extends Activity implements OnClickListener, OnSharedP
         		connected = false;
     		}
     		
-    	//} else if (v.getId() == R.id.status_req) {
-    		// CODE HERE FOR STATUS REQUEST BUTTON?
-    		//myAtomicButtonInteger.getAndSet(1);
+    	
     	} else if (v.getId() == R.id.button_toggle_door) {
-    		// CODE HERE FOR TOGGLE BUTTON?
-    		Log.d("ClientActivity", "Toggle button pressed");
+    		
+    		//Log.d("ClientActivity", "Toggle button pressed");
     		
     		if (crackDoor.isChecked()) {
     			// if the crack checkbox is checked
@@ -251,20 +219,7 @@ public class MainActivity extends Activity implements OnClickListener, OnSharedP
     			// if the crack checkbox is not checked
     			// just send a normal 'toggle' command
     			myAtomicButtonInteger.getAndSet(2);
-    		}
-    	//} else if (v.getId() == R.id.cmd_crack) {
-    		// CODE HERE FOR CRACK BUTTON?
-    		//Log.d("ClientActivity", "Crack button pressed");
-    		//myAtomicButtonInteger.getAndSet(3);
-    	//} else if (v.getId() == R.id.button_disconnect) {
-    		// CODE HERE FOR DISCONNECT BUTTON?
-    		//Log.d("ClientActivity", "Disconnect button pressed");
-    		//myAtomicButtonInteger.getAndSet(4);
-    		//Log.d("ClientActivity", "(After) tmpAtomic=" + myAtomicButtonInteger.get());
-    		//toggleDoor.setEnabled(false);
-    		//connectNet.setText(R.string.connect_button_connect); // Change the text of the connect/disconnect button back to 'Connect'
-    		//currentStatusOfGarageDoor = "0"; // This needs to be reset because it needs to be updated when reconnecting
-    		
+    		}  	
     	}
     }
     
@@ -311,14 +266,13 @@ public class MainActivity extends Activity implements OnClickListener, OnSharedP
 
         defIPDomain = (EditText) findViewById(R.id.ip_domain);
         defPort = (EditText) findViewById(R.id.port);
-        //defIPandPort.setText(getString(R.string.lifeStart));
         defIPDomain.setText(settings_ip_domain);
         defPort.setText(settings_port);
         
-        // *****************BELOW IS NEW 11-29-13!!!!
+        // *****************BELOW IS NEW 11-29-13
 		newGDStatusImage = getResources().getDrawable(R.drawable.ic_inapp_status_unknown);
     	imgGarageDoorStatus.setImageDrawable(newGDStatusImage);
-    	// *****************END NEW 11-29-13!!!!!!!!!
+    	// *****************END NEW 11-29-13
     }
     
     
@@ -348,25 +302,17 @@ public class MainActivity extends Activity implements OnClickListener, OnSharedP
 
     	public void run() {
     		try {
-    			//Uncomment ME InetAddress serverAddr = InetAddress.getByName(serverIpAddress);
-    			Log.d("ClientActivity", "C: Connecting...");
-    			//Socket socket = new Socket(serverAddr, ServerActivity.SERVERPORT);
-    			//Uncomment ME Socket socket = new Socket(serverAddr, serverPort);
+    			
+    			//Log.d("ClientActivity", "C: Connecting...");
     			
     			Socket socket = new Socket();
     			SocketAddress adr = new InetSocketAddress(serverIpAddress, serverPort);
     			socket.connect(adr, 5000); // 2nd parameter is timeout!!!
-    			
-    			
-    			// Timeout doesn't work this way - see above!
-    			//socket.setSoTimeout(5000); //5 second timeout
 
     			connected = true;
     			
     			while (connected) {
-    				
-    				
-    			
+    					
     			// New handler to update connect button to say 'disconnect' because we are connected at this point!
 				handler.post(new Runnable() {
 					public void run() {
@@ -377,16 +323,14 @@ public class MainActivity extends Activity implements OnClickListener, OnSharedP
     				
     				
     			try {
-    				Log.d("ClientActivity", "C: Sending password.");
+    				//Log.d("ClientActivity", "C: Sending password.");
     				PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
-    				 // where you issue the commands
-    				//out.println("Hey Server!");
+    				// where you issue the commands
     				out.println(myPass);
-    				Log.d("ClientActivity", "C: Password," + myPass + ", sent.");
+    				//Log.d("ClientActivity", "C: Password," + myPass + ", sent.");
     				
     				
     				// Not sure if this should go here, but we updated the connection status and enable the toggle door button here
-    				//tvConStatusText.setText(R.string.connection_status_connected);
     				handler.post(new Runnable() {
 						public void run() {
 							tvConStatusText.setText(R.string.connection_status_connected);
@@ -413,14 +357,12 @@ public class MainActivity extends Activity implements OnClickListener, OnSharedP
     				
     					*/
     					
-    					
-    					// This isn't working...possibly because the connection is
-    					// getting closed too fast?
+
     					if (line.toString().contentEquals("incorrect password")) {
     						// Incorrect password stuff here
     						connected = false;
     						socket.close();
-    						Log.d("ServerActivity", "Incorrect Password block ran");
+    						//Log.d("ServerActivity", "Incorrect Password block ran");
     						handler.post(new Runnable() {
 								public void run() {
 									tvConStatusText.setText(R.string.connection_status_disconnected);
@@ -428,11 +370,8 @@ public class MainActivity extends Activity implements OnClickListener, OnSharedP
 									connectNet.setText(R.string.connect_button_connect);
 									toggleDoor.setEnabled(false);
 									Toast.makeText(MainActivity.this, "Incorrect password. Please check your password and try again.", Toast.LENGTH_SHORT).show();
-									//myPass = "";
 								}
 							});
-    						//myPass = "";
-    						//Toast.makeText(MainActivity.this, "Incorrect password. Please check your password and try again.", Toast.LENGTH_SHORT).show();
     						break;
     					}
     					
@@ -444,11 +383,9 @@ public class MainActivity extends Activity implements OnClickListener, OnSharedP
     					// as a feature update later
     					if (line.toString().contentEquals("status:open") || line.toString().contentEquals("status:closed")) {
     					
-    						//if (myAtomicButtonInteger.get() != 4) {
-    							newStatusOfGarageDoor = line.toString();
-    						//}
-    						Log.d("ServerActivity", "newStatusOfGarageDoor: " + newStatusOfGarageDoor);
-    						Log.d("ServerActivity", "currentStatusOfGarageDoor: " + currentStatusOfGarageDoor);
+    						newStatusOfGarageDoor = line.toString();
+    						//Log.d("ServerActivity", "newStatusOfGarageDoor: " + newStatusOfGarageDoor);
+    						//Log.d("ServerActivity", "currentStatusOfGarageDoor: " + currentStatusOfGarageDoor);
     						
     						
     						// If the new and old garage statuses don't match, let's do some stuff
@@ -462,23 +399,23 @@ public class MainActivity extends Activity implements OnClickListener, OnSharedP
     										toggleDoor.setText(R.string.toggle_button_close);
     										crackDoor.setEnabled(false);
     										
-    										// *****************BELOW IS NEW 11-29-13!!!!
+    										// *****************BELOW IS NEW 11-29-13
     										newGDStatusImage = getResources().getDrawable(R.drawable.ic_inapp_status_open);
     								    	imgGarageDoorStatus.setImageDrawable(newGDStatusImage);
-    								    	// *****************END NEW 11-29-13!!!!!!!!!
+    								    	// *****************END NEW 11-29-13
     										
-    										Log.d("ServerActivity", "gdStateChanged!");
+    										//Log.d("ServerActivity", "gdStateChanged!");
     									} else if (newStatusOfGarageDoor.equals("status:closed")) {
     										tvGDStatusText.setText(R.string.status_text_closed);
     										toggleDoor.setText(R.string.toggle_button_open);
     										crackDoor.setEnabled(true);
     										
-    										// *****************BELOW IS NEW 11-29-13!!!!
+    										// *****************BELOW IS NEW 11-29-13
     										newGDStatusImage = getResources().getDrawable(R.drawable.ic_inapp_status_closed);
     								    	imgGarageDoorStatus.setImageDrawable(newGDStatusImage);
-    								    	// *****************END NEW 11-29-13!!!!!!!!!
+    								    	// *****************END NEW 11-29-13
     								    	
-    										Log.d("ServerActivity", "gdStateChanged!");
+    										//Log.d("ServerActivity", "gdStateChanged!");
     									} else {
     										
     										// Temporary..just to see if something else comes in
@@ -488,9 +425,7 @@ public class MainActivity extends Activity implements OnClickListener, OnSharedP
     									}
     									
     									currentStatusOfGarageDoor = newStatusOfGarageDoor;
-    									
-    									//initialStatusSent = true;
-    									
+
     								}
     							});
     						} // End if the new and current garage statuses don't match
@@ -506,22 +441,22 @@ public class MainActivity extends Activity implements OnClickListener, OnSharedP
     					
     					
     					
-    					Log.d("Server response", line.toString());
+    					//Log.d("Server response", line.toString());
     					
-    					Log.d("ClientActivity", "(Still?) tmpAtomic=" + myAtomicButtonInteger.get());
+    					//Log.d("ClientActivity", "(Still?) tmpAtomic=" + myAtomicButtonInteger.get());
     					
     					
     					if (myAtomicButtonInteger.get() == 2) {
     						out.println("cmd=gdToggle@");
-    						Log.d("ClientActivity", "Sent: cmd=gdToggle@");
+    						//Log.d("ClientActivity", "Sent: cmd=gdToggle@");
     						myAtomicButtonInteger.set(0);
     					} else if (myAtomicButtonInteger.get() == 3) {
     						out.println("cmd=gdCrack:" + milsToPauseForCrack + "@");
-    						Log.d("ClientActivity", "Sent: cmd=gdCrack:" + milsToPauseForCrack + "@");
+    						//Log.d("ClientActivity", "Sent: cmd=gdCrack:" + milsToPauseForCrack + "@");
     						myAtomicButtonInteger.set(0);
     					} else if (myAtomicButtonInteger.get() == 4) {
     						out.println("disconnect@");
-    						Log.d("ClientActivity", "Sent: disconnect@");
+    						//Log.d("ClientActivity", "Sent: disconnect@");
     						connected = false;
     						socket.close();
     						myAtomicButtonInteger.set(0);
@@ -533,21 +468,17 @@ public class MainActivity extends Activity implements OnClickListener, OnSharedP
 									crackDoor.setChecked(false);
 									crackDoor.setEnabled(false);
 									
-									// *****************BELOW IS NEW 11-29-13!!!!
+									// *****************BELOW IS NEW 11-29-13
 									newGDStatusImage = getResources().getDrawable(R.drawable.ic_inapp_status_unknown);
 							    	imgGarageDoorStatus.setImageDrawable(newGDStatusImage);
-							    	// *****************END NEW 11-29-13!!!!!!!!!
+							    	// *****************END NEW 11-29-13
 								}
 							});
-    						//tvConStatusText.setText(R.string.connection_status_disconnected);
-    						//socket.close();
+
     						break; // If the disconnect button was pressed, break out of the current 'while' loop (disconnect)
     					}
     		 
 
-    					//connected = false;
-    					//socket.close();
-    					
     				}
     				
     			
@@ -562,13 +493,12 @@ public class MainActivity extends Activity implements OnClickListener, OnSharedP
     			
     			
     				socket.close();
-    				Log.d("ClientActivity", "C: Closed.");
+    				//Log.d("ClientActivity", "C: Closed.");
     				
     				
     				
     				
-    			// New test for timeout catch
-    			// YAAAAHHHH THIS WORKS!!!
+    			// Timeout catch
 				} catch (java.net.SocketTimeoutException ste) {
 					// Do something here to notify user
 					connected = false;
@@ -581,15 +511,13 @@ public class MainActivity extends Activity implements OnClickListener, OnSharedP
 					});
 					
 				//}
-				// End new test for timeout catch
+				// End timeout catch
     				
     				
     			} catch (Exception e) {
     				Log.e("ClientActivity", "C: Error", e);
     				connected = false;
     				
-    				// *** The below needs to be in a handler! ***
-    				// connectNet.setText(R.string.connect_button_connect); // Change the text of the connect/disconnect button back to 'Connect'
     			}
     		
     		
@@ -617,13 +545,12 @@ public class MainActivity extends Activity implements OnClickListener, OnSharedP
 		crackDoor.setChecked(false);
 		crackDoor.setEnabled(false);
 		
-		// *****************BELOW IS NEW 11-29-13!!!!
+		// *****************BELOW IS NEW 11-29-13
 		newGDStatusImage = getResources().getDrawable(R.drawable.ic_inapp_status_unknown);
     	imgGarageDoorStatus.setImageDrawable(newGDStatusImage);
-    	// *****************END NEW 11-29-13!!!!!!!!!
+    	// *****************END NEW 11-29-13
     	
-		//connected = false;
-		// socket.close();
+
     }
     
     
